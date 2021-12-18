@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movies_webapp/views/cinema_views/cinema_room.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -8,11 +9,13 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Center(
-          child: Text('Movies Reservations App'),
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          CinemaRoom(
+            numChairs: 30,
+          )
+        ],
       ),
     );
   }
