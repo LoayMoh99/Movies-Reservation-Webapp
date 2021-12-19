@@ -13,7 +13,7 @@ class _HomeViewState extends State<HomeView> {
       child: Column(
         children: [
           CinemaRoom(
-            numChairs: 30,
+            numChairs: 20,
           )
         ],
       ),

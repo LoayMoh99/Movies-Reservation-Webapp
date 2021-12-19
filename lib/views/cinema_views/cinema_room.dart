@@ -15,7 +15,7 @@ class CinemaRoom extends StatefulWidget {
 
 class _CinemaRoomState extends State<CinemaRoom> {
   List<int> selectedChairs = [
-    ...List.generate(30 ~/ 2, (index) => (index + 1) * 2),
+    ...List.generate(20 ~/ 2, (index) => (index + 1) * 2),
   ];
   @override
   Widget build(BuildContext context) {
