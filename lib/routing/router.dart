@@ -14,8 +14,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _getPageRoute(HomeView(), settings);
     case LoadingRoute:
       return _getPageRoute(ShadeLoading(), settings);
-    case SplashRoute:
-      return _getPageRoute(HomeView(), settings);
     case ForgetRoute:
       return _getPageRoute(ForgetView(), settings);
     case LoginRoute:
