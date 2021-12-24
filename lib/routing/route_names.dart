@@ -1,5 +1,6 @@
 const String HomeRoute = '/';
 const String LoadingRoute = '/loading';
+const String SplashRoute = '/splash';
 const String AboutRoute = '/about';
 const String LoginRoute = '/login';
 const String RegisterRoute = '/register';

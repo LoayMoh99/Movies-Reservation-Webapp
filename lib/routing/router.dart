@@ -5,7 +5,8 @@ import 'package:movies_webapp/views/auth_views/forget_pass.dart';
 import 'package:movies_webapp/views/auth_views/login.dart';
 import 'package:movies_webapp/views/auth_views/register.dart';
 import 'package:movies_webapp/views/headers/about.dart';
-import 'package:movies_webapp/views/home/home_view.dart';
+import 'package:movies_webapp/views/home_views/home_view.dart';
+import 'package:movies_webapp/views/splash.dart';
 import 'package:movies_webapp/widgets/shade_loading.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
@@ -14,6 +15,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _getPageRoute(HomeView(), settings);
     case LoadingRoute:
       return _getPageRoute(ShadeLoading(), settings);
+    case SplashRoute:
+      return _getPageRoute(SplashView(), settings);
     case ForgetRoute:
       return _getPageRoute(ForgetView(), settings);
     case LoginRoute:

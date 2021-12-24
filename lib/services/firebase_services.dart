@@ -137,7 +137,8 @@ class FireBaseServices {
         .collection('users')
         .doc(id)
         .get()
-        .then((data) => role = data['role']);
+        .then((data) => role = data['role'])
+        .catchError((error) => role = "guest");
     return role;
   }
 }
