@@ -11,8 +11,7 @@ class MovieItem extends StatelessWidget {
   //   Navigator.of(ctx).pushNamed(MealDetailsScreen.routeName, arguments: id);
   // }
 
-  MovieItem(@required this.id, @required this.title, @required this.duration,
-      @required this.imageURL);
+  MovieItem(this.id, this.title, this.duration, this.imageURL);
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +70,7 @@ class MovieItem extends StatelessWidget {
                         width: 1,
                       ),
                       Text(
-                        '$duration mins',
+                        '$duration hrs',
                       ),
                     ],
                   ),

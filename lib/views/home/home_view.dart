@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies_webapp/views/cinema_views/cinema_room.dart';
+import 'package:movies_webapp/widgets/Movie_item.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -12,9 +13,7 @@ class _HomeViewState extends State<HomeView> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          CinemaRoom(
-            numChairs: 20,
-          )
+          MovieItem("1", "spider man", 2, "https://picsum.photos/250?image=9")
         ],
       ),
     );
