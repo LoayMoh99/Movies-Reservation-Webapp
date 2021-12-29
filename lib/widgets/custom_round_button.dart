@@ -22,12 +22,16 @@ class CustomRoundButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(25),
         ),
         onPressed: onPress ?? () {},
-        color: colorDefault ? Colors.blue : Colors.white70,
-        child: Text(
-          text,
-          style: TextStyle(
-            color: colorDefault ? Colors.white : Theme.of(context).primaryColor,
-            fontSize: 18,
+        color: colorDefault ? Theme.of(context).primaryColor : Colors.white70,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            text,
+            style: TextStyle(
+              color:
+                  colorDefault ? Colors.white : Theme.of(context).primaryColor,
+              fontSize: size.width > 600 ? 36 : 24,
+            ),
           ),
         ),
       ),

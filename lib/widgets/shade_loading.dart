@@ -50,6 +50,8 @@ class _ShadeLoadingState extends State<ShadeLoading>
       },
       child: Container(
         child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
             itemCount: 10,
             itemBuilder: (context, index) {
               return LoadingBlock();

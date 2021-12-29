@@ -38,7 +38,9 @@ class _LoginViewState extends State<LoginView> {
     passwordController.text = "12345678";
     AuthenticationProvider provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
-    //TODO: make the UI more Web/Mobile compatible i.e. check the size of the screen
+    //: make the UI more Web/Mobile compatible i.e. check the size of the screen
+    double customWidth = size.width > 600 ? 600 : size.width;
+    //double customWidth = size.width;
     return Scaffold(
       backgroundColor: Theme.of(context).accentColor,
       body: SafeArea(
@@ -48,7 +50,7 @@ class _LoginViewState extends State<LoginView> {
                 height: size.height,
                 child: Center(
                   child: CircularProgressIndicator(
-                    backgroundColor: Colors.yellow,
+                    backgroundColor: Theme.of(context).primaryColor,
                   ),
                 ),
               )
@@ -57,14 +59,15 @@ class _LoginViewState extends State<LoginView> {
                   Center(
                     child: SingleChildScrollView(
                       child: Container(
-                        margin: EdgeInsets.all(size.width * 0.075),
+                        width: customWidth,
+                        margin: EdgeInsets.all(customWidth * 0.075),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(35),
                           color: Colors.white,
                         ),
                         padding: EdgeInsets.symmetric(
-                          vertical: size.width * 0.075,
-                          horizontal: size.width * 0.06,
+                          vertical: customWidth * 0.075,
+                          horizontal: customWidth * 0.06,
                         ),
                         child: Column(
                           children: <Widget>[

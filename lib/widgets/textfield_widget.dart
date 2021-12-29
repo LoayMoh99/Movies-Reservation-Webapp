@@ -39,7 +39,7 @@ class TextFieldWidget extends StatelessWidget {
         filled: true,
         enabledBorder: UnderlineInputBorder(
           borderRadius: BorderRadius.circular(25),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: Colors.teal),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25),
