@@ -2,6 +2,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:movies_webapp/const.dart';
 import 'package:movies_webapp/dependencyInjection.dart';
 import 'package:movies_webapp/providers/authentication.dart';
 import 'package:movies_webapp/routing/route_names.dart';
@@ -36,16 +37,14 @@ class MyApp extends StatelessWidget {
       child: Consumer<AuthenticationProvider>(
         builder: (ctx, auth, _) => GetMaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Movies Reservvation',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
+          title: 'Ticketaty',
+          theme: theme,
           builder: (context, child) => LayoutTemplate(
             child: child!,
           ),
           navigatorKey: locator<NavigationService>().navigatorKey,
           onGenerateRoute: generateRoute,
-          initialRoute: HomeRoute,
+          initialRoute: !auth.isAuth ? LoginRoute : HomeRoute,
         ),
       ),
     );

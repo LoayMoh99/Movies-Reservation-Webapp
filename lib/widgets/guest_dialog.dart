@@ -14,18 +14,23 @@ void dialogGuest(BuildContext context) {
         ),
         title: Text(
           'Login as Guest',
-          style: TextStyle(color: Theme.of(context).primaryColorDark),
+          style: TextStyle(color: Colors.white),
         ),
         content: Text(
-            'You will be missing a lot of the Features that Authenticated users have 💔 '),
+          'You will be missing a lot of the Features that Authenticated users have 💔 ',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: <Widget>[
           TextButton(
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(
-                Colors.white,
+                Theme.of(context).primaryColorDark,
               ),
             ),
-            child: Text('Fine'),
+            child: Text(
+              'Fine',
+              style: TextStyle(color: Colors.white),
+            ),
             onPressed: () {
               Navigator.pop(context);
               locator<NavigationService>().navigateTo(HomeRoute);
@@ -36,13 +41,16 @@ void dialogGuest(BuildContext context) {
             child: TextButton(
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(
-                  Colors.white,
+                  Theme.of(context).primaryColorDark,
                 ),
               ),
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ),
         ],

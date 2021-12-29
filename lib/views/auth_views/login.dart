@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies_webapp/providers/authentication.dart';
 import 'package:movies_webapp/routing/route_names.dart';
+import 'package:movies_webapp/services/firebase_services.dart';
 import 'package:movies_webapp/services/navigation_service.dart';
 import 'package:movies_webapp/widgets/custom_round_button.dart';
 import 'package:movies_webapp/widgets/guest_dialog.dart';
@@ -37,7 +38,9 @@ class _LoginViewState extends State<LoginView> {
     passwordController.text = "12345678";
     AuthenticationProvider provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
-    //TODO: make the UI more Web/Mobile compatible i.e. check the size of the screen
+    //: make the UI more Web/Mobile compatible i.e. check the size of the screen
+    double customWidth = size.width > 600 ? 600 : size.width;
+    //double customWidth = size.width;
     return Scaffold(
       backgroundColor: Theme.of(context).accentColor,
       body: SafeArea(
@@ -47,7 +50,7 @@ class _LoginViewState extends State<LoginView> {
                 height: size.height,
                 child: Center(
                   child: CircularProgressIndicator(
-                    backgroundColor: Colors.yellow,
+                    backgroundColor: Theme.of(context).primaryColor,
                   ),
                 ),
               )
@@ -56,28 +59,29 @@ class _LoginViewState extends State<LoginView> {
                   Center(
                     child: SingleChildScrollView(
                       child: Container(
-                        margin: EdgeInsets.all(size.width * 0.075),
+                        width: customWidth,
+                        margin: EdgeInsets.all(customWidth * 0.075),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(35),
                           color: Colors.white,
                         ),
                         padding: EdgeInsets.symmetric(
-                          vertical: size.width * 0.075,
-                          horizontal: size.width * 0.06,
+                          vertical: customWidth * 0.075,
+                          horizontal: customWidth * 0.06,
                         ),
                         child: Column(
                           children: <Widget>[
-                            Center(
-                              child: Text(
-                                'Movies Reservations Webapp',
-                                style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontSize: 46,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
-                            ),
+                            // Center(
+                            //   child: Text(
+                            //     'Movies Reservations Webapp',
+                            //     style: TextStyle(
+                            //       color: Theme.of(context).primaryColor,
+                            //       fontSize: 46,
+                            //       fontWeight: FontWeight.bold,
+                            //       letterSpacing: 1.5,
+                            //     ),
+                            //   ),
+                            // ),
                             Padding(
                               padding: EdgeInsets.symmetric(
                                 vertical: size.height * 0.03,
@@ -167,15 +171,16 @@ class _LoginViewState extends State<LoginView> {
                             GestureDetector(
                               onTap: () async {
                                 // just used here to register a user for first time
-                                /*bool isRegistered = await FireBaseServices()
-                                    .register(
-                                        "LoayTest",
-                                        "Loay",
-                                        "Mohamed",
-                                        emailController.text.trim(),
-                                        passwordController.text,
-                                        "customer",
-                                        context);*/
+                                // bool isRegistered =
+                                //     await FireBaseServices().register(
+                                //         "ManagerTest",
+                                //         "Manager",
+                                //         "Movies",
+                                //         //emailController.text.trim(),
+                                //         "manager@test.com",
+                                //         passwordController.text,
+                                //         "manager",
+                                //         context);
                                 //
                                 FocusScope.of(context).unfocus();
                                 emailController.clear();

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
 class LogoWidget extends StatelessWidget {
+  final double height;
+  final double width;
+
+  const LogoWidget({Key? key, this.height = 100, this.width = 100})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 100,
-      height: 100,
+      width: width,
+      height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
         border: Border.all(

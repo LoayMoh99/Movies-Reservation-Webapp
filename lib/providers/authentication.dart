@@ -18,7 +18,11 @@ class AuthenticationProvider with ChangeNotifier {
 
   bool get isAuth {
     bool temp = FirebaseAuth.instance.currentUser != null;
-    print(temp);
+    print('Auth: $temp');
     return temp;
+  }
+
+  Future<String> getRole() async {
+    return await FireBaseServices().getUserRole();
   }
 }
