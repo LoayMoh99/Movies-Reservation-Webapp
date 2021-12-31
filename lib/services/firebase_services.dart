@@ -390,4 +390,95 @@ class FireBaseServices {
       return false;
     }
   }
+
+  // Cancel tickets reservations
+  Future<bool> cancelTickets(
+    String movieID,
+    List<int> selectedSeats,
+    BuildContext context,
+  ) async {
+    try {
+      bool connection = await Connection().checkInternetConnection();
+      if (!connection) {
+        showErrorDialog(
+          "Network Error",
+          "Check Internet Connection",
+          context,
+        );
+        return false;
+      }
+
+      final CollectionReference moviesRef =
+          FirebaseFirestore.instance.collection('/movies');
+      final CollectionReference usersRef =
+          FirebaseFirestore.instance.collection('/users');
+      await moviesRef.doc(movieID).get().then((value) async {
+        Movie currMovie = Movie.fromMap(movieID, value.data());
+        List<int> newScreeningRoom = currMovie.screeningRoom;
+        print('IN Cancel - before:: newScreeningRoom :' +
+            newScreeningRoom.toString());
+        for (int seat in selectedSeats) {
+          newScreeningRoom.remove(seat);
+        }
+        print('IN Cancel - after:: newScreeningRoom :' +
+            newScreeningRoom.toString());
+        await moviesRef.doc(movieID).update({
+          'screeningRoom': newScreeningRoom,
+        }).then((value) async {
+          await getUserMovies().then((moviesIDs) async {
+            print('IN Cancel: movies :' + moviesIDs.toString());
+            Map<String, List<int>> newMoviesIDs = moviesIDs;
+            if (moviesIDs.isEmpty) return false;
+            //loop on all movies:
+            if (moviesIDs.containsKey(movieID)) {
+              List<int> newSeats = moviesIDs[movieID] ?? [];
+              for (int seat in selectedSeats) {
+                newSeats.remove(seat);
+              }
+              if (newSeats.isEmpty) {
+                newMoviesIDs.remove(movieID);
+              } else {
+                newMoviesIDs[movieID] = newSeats;
+              }
+            }
+            print('IN Cancel: new movies :' + newMoviesIDs.toString());
+
+            await usersRef.doc(getUserID()).update({
+              'moviesIDs': newMoviesIDs,
+            }).then((value) {
+              return true;
+            }).catchError((error) {
+              print(error);
+              showErrorDialog(
+                "Error",
+                "Ticket has not been picked!! Try again later!",
+                context,
+              );
+              return false;
+            });
+          }).catchError((error) {
+            print(error);
+          });
+        }).catchError((error) {
+          print(error);
+          showErrorDialog(
+            "Error",
+            "Ticket has not been picked!! Try again later!",
+            context,
+          );
+        });
+        return false;
+      });
+
+      return true;
+    } catch (error) {
+      print(error);
+      showErrorDialog(
+        "Error",
+        "An error occurs , try again later!",
+        context,
+      );
+      return false;
+    }
+  }
 }

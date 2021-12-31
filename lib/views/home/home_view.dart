@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movies_webapp/views/cinema_views/cinema_room.dart';
 import 'package:movies_webapp/widgets/Movie_item.dart';
 
 class HomeView extends StatefulWidget {

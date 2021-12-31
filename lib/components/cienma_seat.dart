@@ -10,11 +10,13 @@ class CinemaSeat extends StatefulWidget {
   bool isReserved;
 
   bool isSelected;
+  bool cancelCase;
 
   CinemaSeat(
       {Key? key,
       required this.seatNum,
       this.isSelected = false,
+      this.cancelCase = false,
       this.isReserved = false})
       : super(key: key);
 
@@ -30,22 +32,24 @@ class _CinemaSeatState extends State<CinemaSeat> {
     return InkWell(
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
-      onTap: () {
-        // ignore: unnecessary_statements
-        if (!widget.isReserved) widget.isSelected = !widget.isSelected;
+      onTap: widget.cancelCase
+          ? null
+          : () {
+              // ignore: unnecessary_statements
+              if (!widget.isReserved) widget.isSelected = !widget.isSelected;
 
-        if (!widget.isReserved && widget.isSelected) {
-          if (!seatsProvider.addToCurrentSelectedSeats(widget.seatNum)) {
-            widget.isSelected = !widget.isSelected;
-          }
-        }
-        if (!widget.isReserved && !widget.isSelected) {
-          seatsProvider.removeFromCurrentSelectedSeats(widget.seatNum);
-        }
-        print("isReserved - " + widget.isReserved.toString());
-        print("isSelected - " + widget.isSelected.toString());
-        print((seatsProvider.currentSelactedSeats).toString());
-      },
+              if (!widget.isReserved && widget.isSelected) {
+                if (!seatsProvider.addToCurrentSelectedSeats(widget.seatNum)) {
+                  widget.isSelected = !widget.isSelected;
+                }
+              }
+              if (!widget.isReserved && !widget.isSelected) {
+                seatsProvider.removeFromCurrentSelectedSeats(widget.seatNum);
+              }
+              print("isReserved - " + widget.isReserved.toString());
+              print("isSelected - " + widget.isSelected.toString());
+              print((seatsProvider.currentSelactedSeats).toString());
+            },
       child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5.0),
           width: MediaQuery.of(context).size.width / 15,

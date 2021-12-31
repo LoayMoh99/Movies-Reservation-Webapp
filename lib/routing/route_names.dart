@@ -6,3 +6,4 @@ const String LoginRoute = '/login';
 const String RegisterRoute = '/register';
 const String ForgetRoute = '/forget-pass';
 const String BuyTicketRoute = '/buy-ticket';
+const String CancelTicketRoute = '/cancel-ticket';

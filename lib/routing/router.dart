@@ -5,6 +5,7 @@ import 'package:movies_webapp/views/auth_views/forget_pass.dart';
 import 'package:movies_webapp/views/auth_views/login.dart';
 import 'package:movies_webapp/views/auth_views/register.dart';
 import 'package:movies_webapp/views/cinema_views/buy_ticket_view.dart';
+import 'package:movies_webapp/views/cinema_views/cancel_ticket_view.dart';
 import 'package:movies_webapp/views/headers/about.dart';
 import 'package:movies_webapp/views/home_views/home_view.dart';
 import 'package:movies_webapp/views/splash.dart';
@@ -22,6 +23,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _getPageRoute(ForgetView(), settings);
     case BuyTicketRoute:
       return _getPageRoute(BuyTicket(), settings);
+    case CancelTicketRoute:
+      return _getPageRoute(CancelTicket(), settings);
     case LoginRoute:
       return _getPageRoute(LoginView(), settings);
     case RegisterRoute:

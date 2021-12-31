@@ -6,17 +6,18 @@ import 'package:movies_webapp/routing/route_names.dart';
 import 'package:movies_webapp/services/firebase_services.dart';
 import 'package:movies_webapp/services/navigation_service.dart';
 import 'package:movies_webapp/widgets/appbar.dart';
+import 'package:movies_webapp/widgets/error_dialog.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:provider/provider.dart';
 
 import '../../const.dart';
 
-class BuyTicket extends StatefulWidget {
+class CancelTicket extends StatefulWidget {
   @override
-  _BuyTicketState createState() => _BuyTicketState();
+  _CancelTicketState createState() => _CancelTicketState();
 }
 
-class _BuyTicketState extends State<BuyTicket> {
+class _CancelTicketState extends State<CancelTicket> {
   getTheSeats({int roomSize = 20, required SeatsProvider seatsProvider}) {
     List<Widget> seats = [];
     for (int i = 0; i < roomSize; i += 5) {
@@ -25,7 +26,9 @@ class _BuyTicketState extends State<BuyTicket> {
         rowSeats.add(CinemaSeat(
           seatNum: i + j + 1,
           isSelected: seatsProvider.currentSelactedSeats.contains(i + j + 1),
-          isReserved: selectedMovie.screeningRoom.contains(i + j + 1),
+          isReserved: !seatsProvider.currentSelactedSeats.contains(i + j + 1) &&
+              selectedMovie.screeningRoom.contains(i + j + 1),
+          cancelCase: !seatsProvider.currentSelactedSeats.contains(i + j + 1),
         ));
       }
       seats.add(Row(
@@ -101,31 +104,49 @@ class _BuyTicketState extends State<BuyTicket> {
                 ),
               ),
               InkWell(
-                onTap: seatsProvider.currentSelactedSeats.isEmpty
-                    ? null
-                    : () async {
-                        setState(() {
-                          loading = true;
-                        });
-                        bool isAdded = await FireBaseServices().addTickets(
-                          selectedMovie.id,
-                          seatsProvider.currentSelactedSeats,
-                          context,
-                        );
+                onTap: () async {
+                  if (seatsProvider.currentSelactedSeats.isEmpty) {
+                    showErrorDialog(
+                      'Error in canceling!',
+                      'No selected seats (tickets) to cancel it',
+                      context,
+                    );
+                  } else if (selectedMovie.date.day ==
+                          DateTime.now()
+                              .day && // TODO: compare the day more accuratly
+                      selectedMovie.startTime.hour < DateTime.now().hour + 3) {
+                    showErrorDialog(
+                      'Error in canceling!',
+                      'Time to cancel tickets is over!',
+                      context,
+                    );
+                  } else {
+                    print('canceling!!!!!!!!');
+                    print(seatsProvider.currentSelactedSeats);
+                    setState(() {
+                      loading = true;
+                    });
 
-                        setState(() {
-                          loading = false;
-                        });
-                        if (isAdded) {
-                          // ignore: deprecated_member_use
-                          Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Tickets picked successfully!!'),
-                            ),
-                          );
-                          locator<NavigationService>().navigateTo(HomeRoute);
-                        }
-                      },
+                    bool isCanceled = await FireBaseServices().cancelTickets(
+                      selectedMovie.id,
+                      seatsProvider.currentSelactedSeats,
+                      context,
+                    );
+
+                    setState(() {
+                      loading = false;
+                    });
+                    if (isCanceled) {
+                      // ignore: deprecated_member_use
+                      Scaffold.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Tickets cancelled successfully!!'),
+                        ),
+                      );
+                      locator<NavigationService>().navigateTo(HomeRoute);
+                    }
+                  }
+                },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 40.0, vertical: 10.0),
@@ -133,7 +154,7 @@ class _BuyTicketState extends State<BuyTicket> {
                       color: kActionColor,
                       borderRadius:
                           BorderRadius.only(topLeft: Radius.circular(25.0))),
-                  child: Text('Pay',
+                  child: Text('Cancel Tickets',
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 25.0,

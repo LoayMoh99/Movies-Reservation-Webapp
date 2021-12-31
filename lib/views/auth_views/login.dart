@@ -50,7 +50,8 @@ class _LoginViewState extends State<LoginView> {
                 height: size.height,
                 child: Center(
                   child: CircularProgressIndicator(
-                    backgroundColor: Theme.of(context).primaryColor,
+                    backgroundColor: Theme.of(context).accentColor,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
               )

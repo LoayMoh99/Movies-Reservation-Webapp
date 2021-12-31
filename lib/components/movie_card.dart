@@ -34,8 +34,8 @@ class MovieCard extends StatelessWidget {
                   ? MediaQuery.of(context).size.height / 3 * factor
                   : MediaQuery.of(context).size.height / 4 * factor,
               width: active
-                  ? MediaQuery.of(context).size.width / 3 * factor
-                  : MediaQuery.of(context).size.width / 4 * factor,
+                  ? MediaQuery.of(context).size.width / (3 * factor)
+                  : MediaQuery.of(context).size.width / (4 * factor),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(25.0),
                 child: Image.network(

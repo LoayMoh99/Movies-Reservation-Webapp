@@ -38,6 +38,7 @@ class _MoviesViewState extends State<MoviesView> {
   @override
   void initState() {
     getMoviesList();
+    setCurrUserMovies();
     super.initState();
   }
 
@@ -112,14 +113,32 @@ class _MoviesViewState extends State<MoviesView> {
                       ],
                     ),
                     Divider(),
-                    RedRoundedActionButton(
-                        text: 'BUY TICKET',
-                        callback: () {
-                          setSelectedMovie(movies[widget.index]);
-                          seatsProvider.emptySeats();
-                          locator<NavigationService>()
-                              .navigateTo(BuyTicketRoute);
-                        }),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        if (currUserMoviesIDs
+                            .containsKey(movies[widget.index].id))
+                          RedRoundedActionButton(
+                              text: 'Cancel TICKET',
+                              callback: () {
+                                print('cancel reservation!!');
+                                setSelectedMovie(movies[widget.index]);
+                                seatsProvider.emptySeats();
+                                seatsProvider.getReservedSeatsForCancelation();
+                                locator<NavigationService>()
+                                    .navigateTo(CancelTicketRoute);
+                              }),
+                        RedRoundedActionButton(
+                            text: 'Buy TICKET',
+                            callback: () {
+                              print('buy new reservation!!');
+                              setSelectedMovie(movies[widget.index]);
+                              seatsProvider.emptySeats();
+                              locator<NavigationService>()
+                                  .navigateTo(BuyTicketRoute);
+                            }),
+                      ],
+                    ),
                     Expanded(
                         child: ListView.builder(
                             scrollDirection: Axis.horizontal,
@@ -165,7 +184,7 @@ class _MoviesViewState extends State<MoviesView> {
                               title: movies[index].title,
                               imageLink: movies[index].posterUrl,
                               active: index == widget.index ? true : false,
-                              factor: 2,
+                              factor: 1.5,
                               callBack: () {
                                 setState(() {
                                   widget.index = index;
@@ -234,13 +253,33 @@ class _MoviesViewState extends State<MoviesView> {
                                 movies[widget.index].endTime.hour.toString(),
                           ),
                           Divider(),
-                          RedRoundedActionButton(
-                              text: 'BUY TICKET',
-                              callback: () {
-                                print(movies[widget.index].title);
-                                locator<NavigationService>()
-                                    .navigateTo(BuyTicketRoute);
-                              }),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              if (currUserMoviesIDs
+                                  .containsKey(movies[widget.index].id))
+                                RedRoundedActionButton(
+                                    text: 'Cancel TICKET',
+                                    callback: () {
+                                      print('cancel reservation!!');
+                                      setSelectedMovie(movies[widget.index]);
+                                      seatsProvider.emptySeats();
+                                      seatsProvider
+                                          .getReservedSeatsForCancelation();
+                                      locator<NavigationService>()
+                                          .navigateTo(CancelTicketRoute);
+                                    }),
+                              RedRoundedActionButton(
+                                  text: 'Buy TICKET',
+                                  callback: () {
+                                    print('buy new reservation!!');
+                                    setSelectedMovie(movies[widget.index]);
+                                    seatsProvider.emptySeats();
+                                    locator<NavigationService>()
+                                        .navigateTo(BuyTicketRoute);
+                                  }),
+                            ],
+                          ),
                         ],
                       ),
                     ),
