@@ -35,6 +35,8 @@ dependencies:
   firebase_core: ^0.7.0
   connectivity: ^2.0.2
   firebase_storage: ^7.0.0
+  universal_html:
+  firebase:
 
 dev_dependencies:
   flutter_test:

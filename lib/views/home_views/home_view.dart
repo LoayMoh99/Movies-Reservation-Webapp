@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:movies_webapp/providers/authentication.dart';
+import 'package:movies_webapp/providers/movies_provider.dart';
 import 'package:movies_webapp/services/firebase_services.dart';
-import 'package:movies_webapp/views/movies_views/mock_movies_view.dart';
-import 'package:movies_webapp/views/movies_views/movie_view.dart';
+import 'package:movies_webapp/views/movies_views/movies_view.dart';
 import 'package:movies_webapp/widgets/shade_loading.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:provider/provider.dart';
@@ -13,6 +13,12 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  @override
+  void initState() {
+    provideMoviesList();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     AuthenticationProvider auth =
@@ -28,7 +34,7 @@ class _HomeViewState extends State<HomeView> {
                         child: Text('Admin'),
                       )
                     : authResultSnapshot.data == "customer"
-                        ? MockMoviesView()
+                        ? MoviesView()
                         : authResultSnapshot.data == "manager"
                             ? Center(
                                 child: Column(
@@ -68,7 +74,7 @@ class _HomeViewState extends State<HomeView> {
                                   ],
                                 ),
                               )
-                            : MockMoviesView(), //Guest
+                            : MoviesView(), //Guest
       ),
       /*Column(
         children: [

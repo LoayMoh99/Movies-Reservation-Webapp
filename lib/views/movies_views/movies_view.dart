@@ -1,5 +1,3 @@
-// ignore: import_of_legacy_library_into_null_safe
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_webapp/components/background_gradient_image.dart';
 import 'package:movies_webapp/components/dark_borderless_button.dart';
@@ -7,35 +5,33 @@ import 'package:movies_webapp/components/movie_card.dart';
 import 'package:movies_webapp/components/primary_rounder_button.dart';
 import 'package:movies_webapp/components/red_rounded_action_button.dart';
 import 'package:movies_webapp/const.dart';
-import 'package:movies_webapp/datamodels/movies.dart';
+import 'package:movies_webapp/providers/movies_provider.dart';
 import 'package:movies_webapp/routing/route_names.dart';
 import 'package:movies_webapp/services/navigation_service.dart';
 import 'package:movies_webapp/widgets/appbar.dart';
 import 'package:movies_webapp/widgets/shade_loading.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:provider/provider.dart';
 
 import '../../dependencyInjection.dart';
 
 // ignore: must_be_immutable
-class MockMoviesView extends StatefulWidget {
+class MoviesView extends StatefulWidget {
   int index = 1;
 
-  MockMoviesView({Key? key}) : super(key: key);
+  MoviesView({Key? key}) : super(key: key);
   @override
-  _MockMoviesViewState createState() => _MockMoviesViewState();
+  _MoviesViewState createState() => _MoviesViewState();
 }
 
-class _MockMoviesViewState extends State<MockMoviesView> {
-  late List<Movie> movies = [];
+class _MoviesViewState extends State<MoviesView> {
   bool loading = true;
   getMoviesList() {
-    FirebaseFirestore.instance.collection('/movies').snapshots().listen((data) {
-      data.docs.forEach((element) {
-        movies.add(Movie.fromMap(element.data()));
-        print(movies.length);
-      });
-      setState(() {
-        loading = false;
-      });
+    if (movies.isEmpty) {
+      provideMoviesList();
+    }
+    setState(() {
+      loading = false;
     });
   }
 
@@ -50,6 +46,8 @@ class _MockMoviesViewState extends State<MockMoviesView> {
     if (loading)
       return ShadeLoading();
     else {
+      SeatsProvider seatsProvider =
+          Provider.of<SeatsProvider>(context, listen: false);
       final String backgroundImage = movies[widget.index].posterUrl;
       final String available = (movies[widget.index].roomSize -
               movies[widget.index].screeningRoom.length)
@@ -65,6 +63,12 @@ class _MockMoviesViewState extends State<MockMoviesView> {
                 image: Image.network(
                   backgroundImage,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/icons/noimage.jpe',
+                      fit: BoxFit.cover,
+                    );
+                  },
                 ),
               ),
               Container(
@@ -80,7 +84,19 @@ class _MockMoviesViewState extends State<MockMoviesView> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    //Image.asset(movies[widget.index].logo),
+                    const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.0)),
+                    DarkBorderlessTag(
+                      text: movies[widget.index].date.day.toString() +
+                          '/' +
+                          movies[widget.index].date.month.toString() +
+                          '/' +
+                          movies[widget.index].date.year.toString() +
+                          ' from ' +
+                          movies[widget.index].startTime.hour.toString() +
+                          ' to ' +
+                          movies[widget.index].endTime.hour.toString(),
+                    ),
                     const Padding(
                         padding: EdgeInsets.symmetric(vertical: 10.0)),
                     Row(
@@ -95,35 +111,12 @@ class _MockMoviesViewState extends State<MockMoviesView> {
                         ),
                       ],
                     ),
-                    // Padding(
-                    //   padding: const EdgeInsets.symmetric(
-                    //       vertical: 20.0, horizontal: 10.0),
-                    //   child: SingleChildScrollView(
-                    //     scrollDirection: Axis.horizontal,
-                    //     child: Row(
-                    //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    //       children: <Widget>[
-                    //         Text(
-                    //           year,
-                    //           style: kSmallMainTextStyle,
-                    //         ),
-                    //         Text('•', style: kPromaryColorTextStyle),
-                    //         Text(
-                    //           categories,
-                    //           style: kSmallMainTextStyle,
-                    //           overflow: TextOverflow.ellipsis,
-                    //         ),
-                    //         Text('•', style: kPromaryColorTextStyle),
-                    //         Text(technology, style: kSmallMainTextStyle),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
                     Divider(),
                     RedRoundedActionButton(
                         text: 'BUY TICKET',
                         callback: () {
-                          print(movies[widget.index].title);
+                          setSelectedMovie(movies[widget.index]);
+                          seatsProvider.emptySeats();
                           locator<NavigationService>()
                               .navigateTo(BuyTicketRoute);
                         }),
@@ -191,6 +184,12 @@ class _MockMoviesViewState extends State<MockMoviesView> {
                       image: Image.network(
                         backgroundImage,
                         fit: BoxFit.fill,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/icons/noimage.jpe',
+                            fit: BoxFit.cover,
+                          );
+                        },
                       ),
                     ),
                     Container(
@@ -207,7 +206,6 @@ class _MockMoviesViewState extends State<MockMoviesView> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          //Image.asset(movies[widget.index].logo),
                           const Padding(
                               padding: EdgeInsets.symmetric(vertical: 10.0)),
                           Row(
@@ -222,30 +220,19 @@ class _MockMoviesViewState extends State<MockMoviesView> {
                               ),
                             ],
                           ),
-                          // Padding(
-                          //   padding: const EdgeInsets.symmetric(
-                          //       vertical: 20.0, horizontal: 10.0),
-                          //   child: SingleChildScrollView(
-                          //     scrollDirection: Axis.horizontal,
-                          //     child: Row(
-                          //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          //       children: <Widget>[
-                          //         Text(
-                          //           year,
-                          //           style: kSmallMainTextStyle,
-                          //         ),
-                          //         Text('•', style: kPromaryColorTextStyle),
-                          //         Text(
-                          //           categories,
-                          //           style: kSmallMainTextStyle,
-                          //           overflow: TextOverflow.ellipsis,
-                          //         ),
-                          //         Text('•', style: kPromaryColorTextStyle),
-                          //         Text(technology, style: kSmallMainTextStyle),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
+                          const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10.0)),
+                          DarkBorderlessTag(
+                            text: movies[widget.index].date.day.toString() +
+                                '/' +
+                                movies[widget.index].date.month.toString() +
+                                '/' +
+                                movies[widget.index].date.year.toString() +
+                                ' from ' +
+                                movies[widget.index].startTime.hour.toString() +
+                                ' to ' +
+                                movies[widget.index].endTime.hour.toString(),
+                          ),
                           Divider(),
                           RedRoundedActionButton(
                               text: 'BUY TICKET',

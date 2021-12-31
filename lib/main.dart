@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:movies_webapp/const.dart';
 import 'package:movies_webapp/dependencyInjection.dart';
 import 'package:movies_webapp/providers/authentication.dart';
+import 'package:movies_webapp/providers/movies_provider.dart';
 import 'package:movies_webapp/routing/route_names.dart';
 import 'package:movies_webapp/routing/router.dart';
 // ignore: import_of_legacy_library_into_null_safe
@@ -32,6 +33,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(
           value: AuthenticationProvider(),
+        ),
+        ChangeNotifierProvider.value(
+          value: SeatsProvider(),
         ),
       ],
       child: Consumer<AuthenticationProvider>(

@@ -1,7 +1,8 @@
+import 'dart:async';
 // ignore: import_of_legacy_library_into_null_safe
+import 'package:universal_html/prefer_universal/html.dart';
 // ignore: import_of_legacy_library_into_null_safe
-import 'dart:io';
-
+import 'package:firebase/firebase.dart' as fb;
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:movies_webapp/datamodels/movies.dart';
@@ -136,7 +137,7 @@ class FireBaseServices {
     }
   }
 
-  //get role
+  //get User's role
   Future<String> getUserRole() async {
     String id = FirebaseAuth.instance.currentUser.uid;
     String role = "";
@@ -149,9 +150,57 @@ class FireBaseServices {
     return role;
   }
 
+  /// get User's ID
+  String getUserID() {
+    return FirebaseAuth.instance.currentUser.uid;
+  }
+
+  /// get User's movies
+  Future<Map<String, List<int>>> getUserMovies() async {
+    Map<String, List<int>> moviesIDs = {};
+    String id = getUserID();
+    print(id);
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .get()
+        .then((data) {
+      // data['moviesIDs'].forEach((String k, List<int> v) {
+      //   moviesIDs[k] = v;
+      // });
+      print('MoviesIDs ::');
+      print(data['moviesIDs'].keys);
+      print(data['moviesIDs'].values);
+      // List keys = [];
+      for (String key in data['moviesIDs'].keys) {
+        moviesIDs[key] = [];
+        for (int i in data['moviesIDs'][key]) {
+          moviesIDs[key]?.add(i);
+        }
+      }
+      // int index = 0;
+      // for (var value in data['moviesIDs'].values) {
+      //   for (int seat in value) moviesIDs[keys[index++]]?.add(seat);
+      // }
+      //moviesIDs = {}; //data['moviesIDs'] as Map<String, List<int>>;
+
+      print(moviesIDs);
+    });
+    return moviesIDs;
+  }
+
   /// ************ ///
   /// Movies Part  ///
   /// ************ ///
+
+  Future<String> uploadImageFile(File image, String imageName) async {
+    fb.StorageReference storageRef = fb.storage().ref('images/$imageName');
+    fb.UploadTaskSnapshot uploadTaskSnapshot =
+        await storageRef.put(image).future;
+
+    Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
+    return imageUri.toString();
+  }
 
   // Add movies
   Future<bool> addMovie(
@@ -179,37 +228,31 @@ class FireBaseServices {
       final CollectionReference moviesRef =
           FirebaseFirestore.instance.collection('/movies');
       if (photo != null) {
-        firebase_storage.Reference ref = firebase_storage
-            .FirebaseStorage.instance
-            .ref()
-            .child('images/${Path.basename(photo.path)}');
-
-        await ref.putFile(photo).whenComplete(() async {
-          await ref.getDownloadURL().then((photoUrl) async {
-            await moviesRef.add({
-              'title': title,
-              'date': date.toString(),
-              'startTime': startTime.toString(),
-              'endTime': endTime.toString(),
-              'roomSize': roomSize,
-              'screeningRoom': screeningRoom,
-              'posterUrl': photoUrl
-            }).then((value) {
-              showErrorDialog(
-                "Success",
-                "Movie has been added successfully.",
-                context,
-              );
-              return true;
-            }).catchError((error) {
-              print(error);
-              showErrorDialog(
-                "Error",
-                "Movie has not been added. Try again later!",
-                context,
-              );
-              return false;
-            });
+        await uploadImageFile(photo, "${title + startTime.toString()}")
+            .then((photoUrl) async {
+          await moviesRef.add({
+            'title': title,
+            'date': date.toString(),
+            'startTime': startTime.toString(),
+            'endTime': endTime.toString(),
+            'roomSize': roomSize,
+            'screeningRoom': screeningRoom,
+            'posterUrl': photoUrl
+          }).then((value) {
+            showErrorDialog(
+              "Success",
+              "Movie has been added successfully.",
+              context,
+            );
+            return true;
+          }).catchError((error) {
+            print(error);
+            showErrorDialog(
+              "Error",
+              "Movie has not been added. Try again later!",
+              context,
+            );
+            return false;
           });
         });
       } else {
@@ -252,47 +295,99 @@ class FireBaseServices {
     }
   }
 
-  //get movies
-  static Future<List<Movie>> getMovies() async {
-    print('Got called');
-    List<Movie> movies = [];
-    // await FirebaseFirestore.instance
-    //     .collection('/movies')
-    //     .doc('GShfiU99DzZzHy73VJaw')
-    //     .get()
-    //     .then((data) {
-    //   movies.add(Movie.fromMap(data.data()));
-    //   print(movies);
-    //   print('hereeeeeee');
-    // });
-    FirebaseFirestore.instance.collection('/movies').snapshots().listen((data) {
-      data.docs.forEach((element) {
-        print('add movie');
-        movies.add(Movie.fromMap(element.data()));
+  /// ************ ///
+  /// Tickets Part ///
+  /// ************ ///
+
+  // Add tickets
+  Future<bool> addTickets(
+    String movieID,
+    List<int> selectedSeats,
+    BuildContext context,
+  ) async {
+    try {
+      bool connection = await Connection().checkInternetConnection();
+      if (!connection) {
+        showErrorDialog(
+          "Network Error",
+          "Check Internet Connection",
+          context,
+        );
+        return false;
+      }
+
+      final CollectionReference moviesRef =
+          FirebaseFirestore.instance.collection('/movies');
+      final CollectionReference usersRef =
+          FirebaseFirestore.instance.collection('/users');
+      await moviesRef.doc(movieID).get().then((value) async {
+        Movie currMovie = Movie.fromMap(movieID, value.data());
+        List<int> newScreeningRoom = currMovie.screeningRoom;
+        //check if other user picked any of these seats before at the same time:
+        for (int seat in selectedSeats) {
+          if (newScreeningRoom.contains(seat)) {
+            showErrorDialog(
+              "Error",
+              "Other have already picked this seat before at the same time.",
+              context,
+            );
+            return false;
+          }
+        }
+        newScreeningRoom += selectedSeats;
+        await moviesRef.doc(movieID).update({
+          'screeningRoom': newScreeningRoom,
+        }).then((value) async {
+          await getUserMovies().then((moviesIDs) async {
+            print('movies :' + moviesIDs.toString());
+            Map<String, List<int>> newMoviesIDs = moviesIDs;
+            if (moviesIDs.isEmpty) return false;
+            //loop on all movies:
+            if (moviesIDs.containsKey(movieID)) {
+              List<int> newSeats = moviesIDs[movieID] ?? [];
+              newSeats += selectedSeats;
+              newMoviesIDs[movieID] = newSeats;
+            } else {
+              newMoviesIDs[movieID] = selectedSeats;
+            }
+            print('new movies :' + newMoviesIDs.toString());
+
+            await usersRef.doc(getUserID()).update({
+              'moviesIDs': newMoviesIDs,
+            }).then((value) {
+              return true;
+            }).catchError((error) {
+              print(error);
+              showErrorDialog(
+                "Error",
+                "Ticket has not been picked!! Try again later!",
+                context,
+              );
+              return false;
+            });
+          }).catchError((error) {
+            print(error);
+          });
+        }).catchError((error) {
+          print(error);
+          showErrorDialog(
+            "Error",
+            "Ticket has not been picked!! Try again later!",
+            context,
+          );
+        });
+        return false;
       });
-    });
-    // await FirebaseFirestore.instance.collection('/movies').get().then((data) {
-    //   data.docs.forEach((element) {
-    //     movies.add(Movie.fromMap(element.data()));
-    //   });
-    // });
-    // final listToStore =
-    //     (await FirebaseFirestore.instance.collection('/movies').get()).docs;
-    // print('list ');
-    // print(listToStore);
-    // listToStore.forEach((element) {
-    //   movies.add(Movie.fromMap(element.data()));
-    // });
-    // Movie dummy = Movie(
-    //     'title',
-    //     DateTime.now(),
-    //     DateTime.now(),
-    //     DateTime.now().add(Duration(hours: 2)),
-    //     20,
-    //     [1, 5, 9],
-    //     'https://i.picsum.photos/id/111/4400/2656.jpg?hmac=leq8lj40D6cqFq5M_NLXkMYtV-30TtOOnzklhjPaAAQ');
-    // movies.add(dummy);
-    // print(movies[0].title);
-    return movies;
+
+      return true;
+    } catch (error) {
+      print(error);
+      showErrorDialog(
+        "Error",
+        "An error occurs , try again later!",
+        context,
+      );
+      return false;
+    }
   }
 }

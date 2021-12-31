@@ -1,31 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:movies_webapp/providers/movies_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../const.dart';
 
 // ignore: must_be_immutable
-class CienmaSeat extends StatefulWidget {
+class CinemaSeat extends StatefulWidget {
+  int seatNum;
   bool isReserved;
 
   bool isSelected;
 
-  CienmaSeat({Key? key, this.isSelected = false, this.isReserved = false})
+  CinemaSeat(
+      {Key? key,
+      required this.seatNum,
+      this.isSelected = false,
+      this.isReserved = false})
       : super(key: key);
 
   @override
-  _CienmaSeatState createState() => _CienmaSeatState();
+  _CinemaSeatState createState() => _CinemaSeatState();
 }
 
-class _CienmaSeatState extends State<CienmaSeat> {
+class _CinemaSeatState extends State<CinemaSeat> {
   @override
   Widget build(BuildContext context) {
+    SeatsProvider seatsProvider =
+        Provider.of<SeatsProvider>(context, listen: false);
     return InkWell(
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
       onTap: () {
-        setState(() {
-          // ignore: unnecessary_statements
-          !widget.isReserved ? widget.isSelected = !widget.isSelected : null;
-        });
+        // ignore: unnecessary_statements
+        if (!widget.isReserved) widget.isSelected = !widget.isSelected;
+
+        if (!widget.isReserved && widget.isSelected) {
+          if (!seatsProvider.addToCurrentSelectedSeats(widget.seatNum)) {
+            widget.isSelected = !widget.isSelected;
+          }
+        }
+        if (!widget.isReserved && !widget.isSelected) {
+          seatsProvider.removeFromCurrentSelectedSeats(widget.seatNum);
+        }
+        print("isReserved - " + widget.isReserved.toString());
+        print("isSelected - " + widget.isSelected.toString());
+        print((seatsProvider.currentSelactedSeats).toString());
       },
       child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5.0),
