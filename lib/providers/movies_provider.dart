@@ -6,7 +6,6 @@ import 'package:movies_webapp/services/firebase_services.dart';
 
 late List<Movie> movies = [];
 provideMoviesList() {
-  movies = [];
   FirebaseFirestore.instance.collection('/movies').snapshots().listen((data) {
     data.docs.forEach((element) {
       if (checkIfExisted(element.id))

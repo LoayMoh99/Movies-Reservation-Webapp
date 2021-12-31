@@ -34,7 +34,9 @@ class _HomeViewState extends State<HomeView> {
                         child: Text('Admin'),
                       )
                     : authResultSnapshot.data == "customer"
-                        ? MoviesView()
+                        ? MoviesView(
+                            notGuest: true,
+                          )
                         : authResultSnapshot.data == "manager"
                             ? Center(
                                 child: Column(
@@ -74,7 +76,9 @@ class _HomeViewState extends State<HomeView> {
                                   ],
                                 ),
                               )
-                            : MoviesView(), //Guest
+                            : MoviesView(
+                                notGuest: false,
+                              ), //Guest
       ),
       /*Column(
         children: [

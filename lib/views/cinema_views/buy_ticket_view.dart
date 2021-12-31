@@ -38,6 +38,8 @@ class _BuyTicketState extends State<BuyTicket> {
   }
 
   bool loading = false;
+  TextEditingController creditController = new TextEditingController();
+  TextEditingController pinController = new TextEditingController();
   @override
   Widget build(BuildContext context) {
     SeatsProvider seatsProvider = Provider.of<SeatsProvider>(context);
@@ -82,6 +84,52 @@ class _BuyTicketState extends State<BuyTicket> {
                                         seatsProvider: seatsProvider,
                                         roomSize: selectedMovie.roomSize))),
                           ),
+
+                          //two textfields for name and phone number
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: creditController,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      hintText: 'Credit Card Number',
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10.0,
+                                ),
+                                Expanded(
+                                  child: TextField(
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                    controller: pinController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      hintText: 'Pin Number',
+                                      suffixText: 'XXXX',
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
               ),
@@ -101,9 +149,41 @@ class _BuyTicketState extends State<BuyTicket> {
                 ),
               ),
               InkWell(
-                onTap: seatsProvider.currentSelactedSeats.isEmpty
+                onTap: loading || seatsProvider.currentSelactedSeats.isEmpty
                     ? null
                     : () async {
+                        //check for credit and pin numbers:
+                        if (creditController.text.isEmpty ||
+                            pinController.text.isEmpty) {
+                          // ignore: deprecated_member_use
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Please fill all the fields'),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+                          return;
+                        } else if (validateNumbers()) {
+                          // ignore: deprecated_member_use
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  'Please fill all the fields with Only Numbers'),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+                          return;
+                        } else if (pinController.text.length != 4) {
+                          // ignore: deprecated_member_use
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Pin must be 4 Digits'),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+                          return;
+                        }
+
                         setState(() {
                           loading = true;
                         });
@@ -121,6 +201,7 @@ class _BuyTicketState extends State<BuyTicket> {
                           Scaffold.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Tickets picked successfully!!'),
+                              duration: Duration(seconds: 1),
                             ),
                           );
                           locator<NavigationService>().navigateTo(HomeRoute);
@@ -129,11 +210,13 @@ class _BuyTicketState extends State<BuyTicket> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 40.0, vertical: 10.0),
-                  decoration: const BoxDecoration(
-                      color: kActionColor,
+                  decoration: BoxDecoration(
+                      color: loading
+                          ? Theme.of(context).primaryColorDark
+                          : kActionColor,
                       borderRadius:
                           BorderRadius.only(topLeft: Radius.circular(25.0))),
-                  child: Text('Pay',
+                  child: Text(loading ? 'Buying...' : 'Pay',
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 25.0,
@@ -145,5 +228,11 @@ class _BuyTicketState extends State<BuyTicket> {
         ],
       ),
     );
+  }
+
+  bool validateNumbers() {
+    RegExp regExp = new RegExp(r'^[0-9]+$');
+    return !regExp.hasMatch(creditController.text) ||
+        !regExp.hasMatch(pinController.text);
   }
 }

@@ -104,57 +104,65 @@ class _CancelTicketState extends State<CancelTicket> {
                 ),
               ),
               InkWell(
-                onTap: () async {
-                  if (seatsProvider.currentSelactedSeats.isEmpty) {
-                    showErrorDialog(
-                      'Error in canceling!',
-                      'No selected seats (tickets) to cancel it',
-                      context,
-                    );
-                  } else if (selectedMovie.date.day ==
-                          DateTime.now()
-                              .day && // TODO: compare the day more accuratly
-                      selectedMovie.startTime.hour < DateTime.now().hour + 3) {
-                    showErrorDialog(
-                      'Error in canceling!',
-                      'Time to cancel tickets is over!',
-                      context,
-                    );
-                  } else {
-                    print('canceling!!!!!!!!');
-                    print(seatsProvider.currentSelactedSeats);
-                    setState(() {
-                      loading = true;
-                    });
+                onTap: loading
+                    ? null
+                    : () async {
+                        if (seatsProvider.currentSelactedSeats.isEmpty) {
+                          showErrorDialog(
+                            'Error in canceling!',
+                            'No selected seats (tickets) to cancel it',
+                            context,
+                          );
+                        } else if (selectedMovie.date.day ==
+                                DateTime.now()
+                                    .day && // TODO: compare the day more accuratly
+                            selectedMovie.startTime.hour <
+                                DateTime.now().hour + 3) {
+                          showErrorDialog(
+                            'Error in canceling!',
+                            'Time to cancel tickets is over!',
+                            context,
+                          );
+                        } else {
+                          print('canceling!!!!!!!!');
+                          print(seatsProvider.currentSelactedSeats);
+                          setState(() {
+                            loading = true;
+                          });
 
-                    bool isCanceled = await FireBaseServices().cancelTickets(
-                      selectedMovie.id,
-                      seatsProvider.currentSelactedSeats,
-                      context,
-                    );
+                          bool isCanceled =
+                              await FireBaseServices().cancelTickets(
+                            selectedMovie.id,
+                            seatsProvider.currentSelactedSeats,
+                            context,
+                          );
 
-                    setState(() {
-                      loading = false;
-                    });
-                    if (isCanceled) {
-                      // ignore: deprecated_member_use
-                      Scaffold.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Tickets cancelled successfully!!'),
-                        ),
-                      );
-                      locator<NavigationService>().navigateTo(HomeRoute);
-                    }
-                  }
-                },
+                          setState(() {
+                            loading = false;
+                          });
+                          if (isCanceled) {
+                            // ignore: deprecated_member_use
+                            Scaffold.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text('Tickets cancelled successfully!!'),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                            locator<NavigationService>().navigateTo(HomeRoute);
+                          }
+                        }
+                      },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 40.0, vertical: 10.0),
-                  decoration: const BoxDecoration(
-                      color: kActionColor,
+                  decoration: BoxDecoration(
+                      color: loading
+                          ? Theme.of(context).primaryColorDark
+                          : kActionColor,
                       borderRadius:
                           BorderRadius.only(topLeft: Radius.circular(25.0))),
-                  child: Text('Cancel Tickets',
+                  child: Text(loading ? 'Canceling...' : 'Cancel Tickets',
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 25.0,

@@ -18,8 +18,8 @@ import '../../dependencyInjection.dart';
 // ignore: must_be_immutable
 class MoviesView extends StatefulWidget {
   int index = 1;
-
-  MoviesView({Key? key}) : super(key: key);
+  final bool notGuest;
+  MoviesView({Key? key, this.notGuest = true}) : super(key: key);
   @override
   _MoviesViewState createState() => _MoviesViewState();
 }
@@ -29,6 +29,7 @@ class _MoviesViewState extends State<MoviesView> {
   getMoviesList() {
     if (movies.isEmpty) {
       provideMoviesList();
+      print('movies: ' + movies.toString());
     }
     setState(() {
       loading = false;
@@ -38,7 +39,7 @@ class _MoviesViewState extends State<MoviesView> {
   @override
   void initState() {
     getMoviesList();
-    setCurrUserMovies();
+    if (widget.notGuest) setCurrUserMovies();
     super.initState();
   }
 
@@ -46,7 +47,20 @@ class _MoviesViewState extends State<MoviesView> {
   Widget build(BuildContext context) {
     if (loading)
       return ShadeLoading();
-    else {
+    else if (movies.isEmpty) {
+      return Container(
+        height: MediaQuery.of(context).size.height,
+        child: Center(
+          child: Text(
+            'No Movies Found',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+    } else {
       SeatsProvider seatsProvider =
           Provider.of<SeatsProvider>(context, listen: false);
       final String backgroundImage = movies[widget.index].posterUrl;
@@ -116,8 +130,9 @@ class _MoviesViewState extends State<MoviesView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        if (currUserMoviesIDs
-                            .containsKey(movies[widget.index].id))
+                        if (widget.notGuest &&
+                            currUserMoviesIDs
+                                .containsKey(movies[widget.index].id))
                           RedRoundedActionButton(
                               text: 'Cancel TICKET',
                               callback: () {
@@ -130,13 +145,69 @@ class _MoviesViewState extends State<MoviesView> {
                               }),
                         RedRoundedActionButton(
                             text: 'Buy TICKET',
-                            callback: () {
-                              print('buy new reservation!!');
-                              setSelectedMovie(movies[widget.index]);
-                              seatsProvider.emptySeats();
-                              locator<NavigationService>()
-                                  .navigateTo(BuyTicketRoute);
-                            }),
+                            callback: !widget.notGuest
+                                ? () {
+                                    showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: Text(
+                                          'You are not logged in!',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        content: Directionality(
+                                          textDirection: TextDirection.rtl,
+                                          child: Text(
+                                            'Please Register or Login to be able to buy a ticket!',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all(
+                                                Theme.of(context).primaryColor,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              'Ok',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            onPressed: () {
+                                              locator<NavigationService>()
+                                                  .navigateTo(LoginRoute);
+                                            },
+                                          ),
+                                          TextButton(
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all(
+                                                Theme.of(context).primaryColor,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              'Cancel',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.of(ctx).pop();
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                : () {
+                                    print('buy new reservation!!');
+                                    setSelectedMovie(movies[widget.index]);
+                                    seatsProvider.emptySeats();
+                                    locator<NavigationService>()
+                                        .navigateTo(BuyTicketRoute);
+                                  }),
                       ],
                     ),
                     Expanded(
@@ -256,8 +327,9 @@ class _MoviesViewState extends State<MoviesView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              if (currUserMoviesIDs
-                                  .containsKey(movies[widget.index].id))
+                              if (widget.notGuest &&
+                                  currUserMoviesIDs
+                                      .containsKey(movies[widget.index].id))
                                 RedRoundedActionButton(
                                     text: 'Cancel TICKET',
                                     callback: () {
@@ -271,13 +343,77 @@ class _MoviesViewState extends State<MoviesView> {
                                     }),
                               RedRoundedActionButton(
                                   text: 'Buy TICKET',
-                                  callback: () {
-                                    print('buy new reservation!!');
-                                    setSelectedMovie(movies[widget.index]);
-                                    seatsProvider.emptySeats();
-                                    locator<NavigationService>()
-                                        .navigateTo(BuyTicketRoute);
-                                  }),
+                                  callback: !widget.notGuest
+                                      ? () {
+                                          showDialog(
+                                            barrierDismissible: false,
+                                            context: context,
+                                            builder: (ctx) => AlertDialog(
+                                              title: Text(
+                                                'You are not logged in!',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              content: Directionality(
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                                child: Text(
+                                                  'Please Register or Login to be able to buy a ticket!',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all(
+                                                      Theme.of(context)
+                                                          .primaryColor,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    'Ok',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                  onPressed: () {
+                                                    locator<NavigationService>()
+                                                        .navigateTo(
+                                                            RegisterRoute);
+                                                  },
+                                                ),
+                                                TextButton(
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all(
+                                                      Theme.of(context)
+                                                          .primaryColor,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    'Cancel',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.pop(ctx);
+                                                  },
+                                                )
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      : () {
+                                          print('buy new reservation!!');
+                                          setSelectedMovie(
+                                              movies[widget.index]);
+                                          seatsProvider.emptySeats();
+                                          locator<NavigationService>()
+                                              .navigateTo(BuyTicketRoute);
+                                        }),
                             ],
                           ),
                         ],
