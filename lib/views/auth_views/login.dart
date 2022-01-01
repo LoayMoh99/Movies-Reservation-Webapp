@@ -34,7 +34,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    emailController.text = "loay@test.com";
+    emailController.text = "admin@test.com";
     passwordController.text = "12345678";
     AuthenticationProvider provider =
         Provider.of<AuthenticationProvider>(context, listen: false);
@@ -172,24 +172,25 @@ class _LoginViewState extends State<LoginView> {
                             GestureDetector(
                               onTap: () async {
                                 // just used here to register a user for first time
-                                // bool isRegistered =
-                                //     await FireBaseServices().register(
-                                //         "ManagerTest",
-                                //         "Manager",
-                                //         "Movies",
-                                //         //emailController.text.trim(),
-                                //         "manager@test.com",
-                                //         passwordController.text,
-                                //         "manager",
-                                //         context);
-                                //
-                                FocusScope.of(context).unfocus();
-                                emailController.clear();
-                                passwordController.clear();
-                                //if (isRegistered) {
-                                locator<NavigationService>()
-                                    .navigateTo(RegisterRoute);
-                                //}
+                                bool isRegistered =
+                                    await FireBaseServices().register(
+                                        "wannaBemangeeeeer2",
+                                        "mangertobe2",
+                                        "Movies2",
+                                        //emailController.text.trim(),
+                                        "wannabemanageeeeeeer2@test.com",
+                                        passwordController.text,
+                                        "customer",
+                                        true,
+                                        context);
+
+                                // FocusScope.of(context).unfocus();
+                                // emailController.clear();
+                                // passwordController.clear();
+                                // if (isRegistered) {
+                                //   locator<NavigationService>()
+                                //       .navigateTo(RegisterRoute);
+                                // }
                               }, //go to register view page
                               child: Text(
                                 'Register',

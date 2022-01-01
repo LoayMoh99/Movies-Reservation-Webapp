@@ -6,9 +6,6 @@ import 'package:firebase/firebase.dart' as fb;
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:movies_webapp/datamodels/movies.dart';
-import 'package:path/path.dart' as Path;
-// ignore: import_of_legacy_library_into_null_safe
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movies_webapp/services/Connection.dart';
@@ -72,6 +69,7 @@ class FireBaseServices {
     String email,
     String password,
     String role,
+    bool wannaBeManager,
     BuildContext context,
   ) async {
     FirebaseApp secondaryApp;
@@ -115,6 +113,7 @@ class FireBaseServices {
 
       await usersRef.doc(userCredential.user.uid).set({
         'role': role,
+        'wannaBeManager': wannaBeManager,
         'email': email,
         'userName': userName,
         'firstName': firstName,
@@ -148,6 +147,51 @@ class FireBaseServices {
         .then((data) => role = data['role'])
         .catchError((error) => role = "guest");
     return role;
+  }
+
+  //delete User's account
+  Future<bool> deleteUser(String userId, String email, String password) async {
+    bool deleted = false;
+    try {
+      //get Auth user by specific email and password:
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (userCredential.user == null) {
+        return false;
+      }
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .delete()
+          .then((value) => deleted = true)
+          .catchError((onError) => deleted = false);
+
+      await userCredential.user.delete();
+      deleted = true;
+    } catch (e) {
+      print(e.toString());
+      deleted = false;
+    }
+    return deleted;
+  }
+
+  //update User's role
+  Future<bool> updateUserRole(String upadteUserID) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(upadteUserID)
+        .update({
+      'role': 'manager',
+      'wannaBeManager': false,
+    }).then((value) {
+      return true;
+    }).catchError((error) {
+      return false;
+    });
+    return true;
   }
 
   /// get User's ID

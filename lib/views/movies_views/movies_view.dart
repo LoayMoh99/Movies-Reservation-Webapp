@@ -49,7 +49,7 @@ class _MoviesViewState extends State<MoviesView> {
       return ShadeLoading();
     else if (movies.isEmpty) {
       return Container(
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery.of(context).size.height - appBarSize.height,
         child: Center(
           child: Text(
             'No Movies Found',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movies_webapp/providers/authentication.dart';
 import 'package:movies_webapp/providers/movies_provider.dart';
 import 'package:movies_webapp/services/firebase_services.dart';
+import 'package:movies_webapp/views/home_views/admin_view.dart';
 import 'package:movies_webapp/views/movies_views/movies_view.dart';
 import 'package:movies_webapp/widgets/shade_loading.dart';
 // ignore: import_of_legacy_library_into_null_safe
@@ -23,6 +24,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     AuthenticationProvider auth =
         Provider.of<AuthenticationProvider>(context, listen: false);
+    if (isAuth) auth.getAllUsers();
     return SingleChildScrollView(
       child: FutureBuilder(
         future: auth.getRole(),
@@ -30,9 +32,7 @@ class _HomeViewState extends State<HomeView> {
             authResultSnapshot.connectionState == ConnectionState.waiting
                 ? ShadeLoading()
                 : authResultSnapshot.data == "admin"
-                    ? Center(
-                        child: Text('Admin'),
-                      )
+                    ? AdminView()
                     : authResultSnapshot.data == "customer"
                         ? MoviesView(
                             notGuest: true,
@@ -81,12 +81,12 @@ class _HomeViewState extends State<HomeView> {
                               ), //Guest
       ),
       /*Column(
-        children: [
-          CinemaRoom(
-            numChairs: 20,
-          )
-        ],
-      ),*/
+          children: [
+            CinemaRoom(
+              numChairs: 20,
+            )
+          ],
+        ),*/
     );
   }
 }
