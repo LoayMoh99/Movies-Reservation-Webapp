@@ -6,12 +6,15 @@ import 'package:movies_webapp/services/firebase_services.dart';
 
 late List<Movie> movies = [];
 provideMoviesList() {
+  print('provideMoviesList');
   FirebaseFirestore.instance.collection('/movies').snapshots().listen((data) {
+    movies = [];
     data.docs.forEach((element) {
-      if (checkIfExisted(element.id)) {
-        Movie toAdd = Movie.fromMap(element.id, element.data());
-        if (DateTime.now().isBefore(toAdd.date)) movies.add(toAdd);
-      }
+      // if (checkIfExisted(element.id)) {
+      Movie toAdd = Movie.fromMap(element.id, element.data());
+      print(DateTime.now().isBefore(toAdd.startTime));
+      if (DateTime.now().isBefore(toAdd.startTime)) movies.add(toAdd);
+      //}
     });
   });
 }

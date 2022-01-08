@@ -22,11 +22,21 @@ class MovieInput extends StatefulWidget {
 
 class _MovieInputState extends State<MovieInput> {
   final titleinputController = new TextEditingController();
-  late html.File? fromPicker;
-  int _roomsize = 0;
+  html.File? fromPicker;
+  int _roomsize = 20;
   bool exist = false;
+  //old values
+  String title = '';
+  int oldRoomSize = -1;
+  int dateDay = -1;
+  int dateMonth = -1;
+  int dateYear = -1;
+  int startHour = -1;
+  int startMin = -1;
+  int endHour = -1;
+  int endMin = -1;
 
-  late DateTime _pickedDate = DateTime.now();
+  DateTime _pickedDate = DateTime.now();
 
   TimeOfDay _timestart = TimeOfDay.now();
   TimeOfDay _timeEnd = TimeOfDay.now();
@@ -47,14 +57,23 @@ class _MovieInputState extends State<MovieInput> {
     loading = false;
     if (widget.edit) {
       titleinputController.text = movies[widget.index].title;
+      title = movies[widget.index].title;
       _roomsize = movies[widget.index].roomSize;
+      oldRoomSize = _roomsize;
       _pickedDate = movies[widget.index].date;
+      dateDay = _pickedDate.day;
+      dateMonth = _pickedDate.month;
+      dateYear = _pickedDate.year;
       _timestart = TimeOfDay(
           hour: movies[widget.index].startTime.hour,
           minute: movies[widget.index].startTime.minute);
+      startHour = _timestart.hour;
+      startMin = _timestart.minute;
       _timeEnd = TimeOfDay(
           hour: movies[widget.index].endTime.hour,
           minute: movies[widget.index].endTime.minute);
+      endHour = _timeEnd.hour;
+      endMin = _timeEnd.minute;
     }
     super.initState();
   }
@@ -101,7 +120,7 @@ class _MovieInputState extends State<MovieInput> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Card(
-        color: Colors.white38,
+        color: Colors.white54,
         elevation: 3,
         child: Container(
           padding: EdgeInsets.only(
@@ -115,7 +134,7 @@ class _MovieInputState extends State<MovieInput> {
               TextField(
                 controller: titleinputController,
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: Colors.black,
                 ),
                 textAlign: TextAlign.left,
                 cursorColor: Colors.black,
@@ -221,88 +240,180 @@ class _MovieInputState extends State<MovieInput> {
                   onPressed: loading
                       ? null
                       : () async {
-                          setState(() {
-                            loading = true;
-                          });
-                          for (Movie movie in movies) {
-                            if (movie.title == titleinputController.text &&
-                                movie.date == _pickedDate &&
-                                movie.startTime ==
-                                    DateTime(
-                                        _pickedDate.year,
-                                        _pickedDate.month,
-                                        _pickedDate.day,
-                                        _timestart.hour,
-                                        _timestart.minute) &&
-                                movie.endTime ==
-                                    DateTime(
-                                        _pickedDate.year,
-                                        _pickedDate.month,
-                                        _pickedDate.day,
-                                        _timeEnd.hour,
-                                        _timeEnd.minute) &&
-                                movie.roomSize == _roomsize &&
-                                movie.screeningRoom == []) {
-                              print(movie.title);
-                              print(movie.date);
-                              print(movie.startTime);
-                              print(movie.endTime);
-                              print(movie.roomSize);
-                              print(movie.screeningRoom);
-                              exist = true;
-                            }
-                          }
+                          // for (Movie movie in movies) {
+                          //   if (movie.title == titleinputController.text &&
+                          //       movie.date == _pickedDate &&
+                          //       movie.startTime ==
+                          //           DateTime(
+                          //               _pickedDate.year,
+                          //               _pickedDate.month,
+                          //               _pickedDate.day,
+                          //               _timestart.hour,
+                          //               _timestart.minute) &&
+                          //       movie.endTime ==
+                          //           DateTime(
+                          //               _pickedDate.year,
+                          //               _pickedDate.month,
+                          //               _pickedDate.day,
+                          //               _timeEnd.hour,
+                          //               _timeEnd.minute) &&
+                          //       movie.roomSize == _roomsize &&
+                          //       movie.screeningRoom == []) {
+                          //     print(movie.title);
+                          //     print(movie.date);
+                          //     print(movie.startTime);
+                          //     print(movie.endTime);
+                          //     print(movie.roomSize);
+                          //     print(movie.screeningRoom);
+                          //     exist = true;
+                          //   }
+                          // }
+                          DateTime start = DateTime(
+                              _pickedDate.year,
+                              _pickedDate.month,
+                              _pickedDate.day,
+                              _timestart.hour,
+                              _timestart.minute);
+                          DateTime end = DateTime(
+                              _pickedDate.year,
+                              _pickedDate.month,
+                              _pickedDate.day,
+                              _timeEnd.hour,
+                              _timeEnd.minute);
+                          //some validations:
                           if (!widget.edit) {
-                            print(exist);
-                            if (!exist) {
-                              bool movieAdded = await FireBaseServices().addMovie(
-                                  titleinputController.text,
-                                  _pickedDate,
-                                  DateTime(
-                                      _pickedDate.year,
-                                      _pickedDate.month,
-                                      _pickedDate.day,
-                                      _timestart.hour,
-                                      _timestart.minute),
-                                  DateTime(
-                                      _pickedDate.year,
-                                      _pickedDate.month,
-                                      _pickedDate.day,
-                                      _timeEnd.hour,
-                                      _timeEnd.minute),
-                                  _roomsize,
-                                  [],
-                                  fromPicker,
-                                  'https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_.jpg',
-                                  context);
-                              if (movieAdded) {
-                                // ignore: deprecated_member_use
-                                Scaffold.of(context).showSnackBar(SnackBar(
-                                    content: Text('Movie added successfully')));
-                              } else {
-                                // ignore: deprecated_member_use
-                                Scaffold.of(context).showSnackBar(SnackBar(
-                                    content: Text('Movie could not be added')));
+                            if (titleinputController.text.isEmpty) {
+                              // ignore: deprecated_member_use
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                  content:
+                                      Text('Can\'t leave title empty!! ')));
+                              return;
+                            }
+                            //the movie must be at least one hour long:
+                            if (!(end.hour - start.hour >= 1)) {
+                              // ignore: deprecated_member_use
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      'End-time must be at least 1 hour greater than start-time')));
+                              return;
+                            }
+                            if (end.isBefore(start)) {
+                              // ignore: deprecated_member_use
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      'End-time must be after start-time')));
+                              return;
+                            }
+                            if (_pickedDate.day == (DateTime.now().day) &&
+                                start.hour == (DateTime.now().hour)) {
+                              // ignore: deprecated_member_use
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      'The picked date/times can\'t be just now or in the past')));
+                              return;
+                            }
+                            //check if this movie date and start and end times is already reserved for the same room
+                            for (Movie movie in movies) {
+                              if (_pickedDate.day == movie.date.day &&
+                                  _pickedDate.month == movie.date.month &&
+                                  _pickedDate.year == movie.date.year) {
+                                if ((start.hour >= movie.startTime.hour &&
+                                        start.hour <= movie.endTime.hour) ||
+                                    (end.hour >= movie.startTime.hour &&
+                                        end.hour <= movie.endTime.hour)) {
+                                  if (_roomsize == movie.roomSize)
+                                    // ignore: deprecated_member_use
+                                    Scaffold.of(context).showSnackBar(SnackBar(
+                                        content: Text(
+                                            'The picked date and times with this room size is already reserved')));
+                                  return;
+                                }
                               }
                             }
+                            setState(() {
+                              loading = true;
+                            });
+
+                            bool movieAdded = await FireBaseServices().addMovie(
+                                titleinputController.text,
+                                _pickedDate,
+                                start,
+                                end,
+                                _roomsize,
+                                [],
+                                fromPicker,
+                                'https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_.jpg',
+                                context);
+                            if (movieAdded) {
+                              // ignore: deprecated_member_use
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text('Movie added successfully')));
+                            } else {
+                              // ignore: deprecated_member_use
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text('Movie could not be added')));
+                            }
                           } else {
+                            setState(() {
+                              loading = true;
+                            });
+
+                            //check if roomsize is updated:
+                            if (oldRoomSize != -1 && oldRoomSize > _roomsize) {
+                              //room was 30 -> 20
+                              print('here');
+                              //see if in the picked seats ->seats Num > 20:
+                              for (int seatNo
+                                  in movies[widget.index].screeningRoom) {
+                                if (seatNo > 20) {
+                                  // ignore: deprecated_member_use
+                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                      content: Text(
+                                          'Can\'t change this room size as there are seats above seat number 20!!')));
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                  return;
+                                }
+                              }
+                            }
+                            //check if no any changed values:
+                            /*
+                            String title = '';
+                            int oldRoomSize = -1;
+                            int dateDay = -1;
+                            int dateMonth = -1;
+                            int dateYear = -1;
+                            int startHour = -1;
+                            int startMin = -1;
+                            int endHour = -1;
+                            int endMin = -1;
+                            */
+                            if (title == titleinputController.text &&
+                                oldRoomSize == _roomsize &&
+                                dateDay == _pickedDate.day &&
+                                dateMonth == _pickedDate.month &&
+                                dateYear == _pickedDate.year &&
+                                startHour == start.hour &&
+                                startMin == start.minute &&
+                                endHour == end.hour &&
+                                endMin == end.minute) {
+                              // ignore: deprecated_member_use
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      'No any values have been change to update!!')));
+                              setState(() {
+                                loading = false;
+                              });
+                              return;
+                            }
                             bool movieAdded = await FireBaseServices()
                                 .updateMovie(
                                     movies[widget.index].id,
                                     titleinputController.text,
                                     _pickedDate,
-                                    DateTime(
-                                        _pickedDate.year,
-                                        _pickedDate.month,
-                                        _pickedDate.day,
-                                        _timestart.hour,
-                                        _timestart.minute),
-                                    DateTime(
-                                        _pickedDate.year,
-                                        _pickedDate.month,
-                                        _pickedDate.day,
-                                        _timeEnd.hour,
-                                        _timeEnd.minute),
+                                    start,
+                                    end,
                                     _roomsize,
                                     context);
                             if (movieAdded) {
