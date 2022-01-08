@@ -37,7 +37,7 @@ dependencies:
   firebase_storage: ^7.0.0
   universal_html:
   firebase:
-
+  image_picker_web: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

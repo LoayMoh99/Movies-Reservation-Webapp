@@ -1,17 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
+import 'package:movies_webapp/datamodels/movies.dart';
+import '../../widgets/Movie_text_Input.dart';
 
 class MovieItem extends StatelessWidget {
-  final String id;
+  final int idx;
   final String title;
   final String imageURL;
-  final int duration;
+  final int roomsize;
+  final DateTime date;
+  final TimeOfDay start;
+  final TimeOfDay end;
 
-  // void goToselectMeal(BuildContext ctx) {
-  //   Navigator.of(ctx).pushNamed(MealDetailsScreen.routeName, arguments: id);
-  // }
+  MovieItem(this.idx, this.title, this.date, this.start, this.end,
+      this.imageURL, this.roomsize);
 
-  MovieItem(this.id, this.title, this.duration, this.imageURL);
+  void _addNewMovie(BuildContext ctx) {}
+
+  void addInputDrawer(BuildContext ctx, bool edit, int index) {
+    showModalBottomSheet(
+        context: ctx,
+        builder: (_) {
+          return GestureDetector(
+            child: MovieInput(_addNewMovie, edit, index),
+            onTap: () {},
+            behavior: HitTestBehavior.opaque,
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +49,15 @@ class MovieItem extends StatelessWidget {
                   ),
                   child: Image.network(
                     imageURL,
-                    height: 250,
-                    width: double.infinity,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height / 3,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/icons/noimage.jpe',
+                        fit: BoxFit.cover,
+                      );
+                    },
                   ),
                 ),
                 Positioned(
@@ -67,26 +90,44 @@ class MovieItem extends StatelessWidget {
                     children: [
                       Icon(Icons.schedule),
                       SizedBox(
-                        width: 1,
+                        width: 5,
                       ),
                       Text(
-                        '$duration hrs',
-                      ),
+                          start.format(context).toString() +
+                              " - " +
+                              end.format(context).toString(),
+                          style: TextStyle(color: Colors.white)),
                     ],
                   ),
                   Row(
                     children: [
-                      Icon(Icons.done),
+                      Icon(Icons.calendar_today_sharp),
                       SizedBox(
-                        width: 1,
+                        width: 5,
                       ),
+                      Text(
+                        DateFormat('yyyy-MM-dd').format(date).toString(),
+                        style: TextStyle(color: Colors.white),
+                      )
                     ],
                   ),
                   Row(
                     children: [
-                      Icon(Icons.attach_money),
+                      IconButton(
+                          icon: Icon(
+                            Icons.edit,
+                          ),
+                          onPressed: () =>
+                              {addInputDrawer(context, true, idx)}),
                       SizedBox(
-                        width: 1,
+                        width: 3,
+                      ),
+                      Text(
+                        "Edit",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(
+                        width: 3,
                       ),
                     ],
                   )
