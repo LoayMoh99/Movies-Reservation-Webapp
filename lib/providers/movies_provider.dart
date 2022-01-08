@@ -8,8 +8,10 @@ late List<Movie> movies = [];
 provideMoviesList() {
   FirebaseFirestore.instance.collection('/movies').snapshots().listen((data) {
     data.docs.forEach((element) {
-      if (checkIfExisted(element.id))
-        movies.add(Movie.fromMap(element.id, element.data()));
+      if (checkIfExisted(element.id)) {
+        Movie toAdd = Movie.fromMap(element.id, element.data());
+        if (DateTime.now().isBefore(toAdd.date)) movies.add(toAdd);
+      }
     });
   });
 }

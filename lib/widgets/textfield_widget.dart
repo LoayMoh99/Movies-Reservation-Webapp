@@ -8,6 +8,7 @@ class TextFieldWidget extends StatelessWidget {
   final Function()? suffixOnTap;
   final controller;
   final keyboardType;
+  final validator;
   final bool autoFocus;
 
   const TextFieldWidget({
@@ -19,12 +20,13 @@ class TextFieldWidget extends StatelessWidget {
     this.suffixOnTap,
     this.controller,
     this.keyboardType = TextInputType.text,
+    @required this.validator,
     this.autoFocus = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       keyboardType: keyboardType,
       controller: controller,
       obscureText: obscureText,
@@ -62,6 +64,7 @@ class TextFieldWidget extends StatelessWidget {
         ),
       ),
       autofocus: autoFocus,
+      validator: validator,
     );
   }
 }

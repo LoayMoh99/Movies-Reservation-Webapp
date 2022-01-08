@@ -44,6 +44,12 @@ class _MoviesViewState extends State<MoviesView> {
   }
 
   @override
+  void didChangeDependencies() {
+    getMoviesList();
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (loading)
       return ShadeLoading();

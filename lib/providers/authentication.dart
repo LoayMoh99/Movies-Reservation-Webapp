@@ -1,5 +1,6 @@
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:cloud_firestore/cloud_firestore.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:movies_webapp/datamodels/user.dart' as usr;
 import 'package:flutter/material.dart';
@@ -18,6 +19,21 @@ class AuthenticationProvider with ChangeNotifier {
     return loggedIn;
   }
 
+  Future<bool> register(
+      BuildContext context,
+      String userName,
+      String firstName,
+      String lastName,
+      String email,
+      String password,
+      String role,
+      bool wannaBeManager) async {
+    bool signedIn = await FireBaseServices().register(userName, firstName,
+        lastName, email, password, role, wannaBeManager, context);
+    notifyListeners();
+    return signedIn;
+  }
+
   Future<String> getRole() async {
     return await FireBaseServices().getUserRole();
   }
@@ -34,7 +50,7 @@ class AuthenticationProvider with ChangeNotifier {
         data.docs.forEach((element) {
           if (element.id != null &&
               checkIfUserExisted(element.id) &&
-              element.id != currUserId)
+              element.data()['role'] != 'admin')
             users.add(usr.User.fromMap(element.id, element.data()));
         });
         notifyListeners();
@@ -53,4 +69,11 @@ class AuthenticationProvider with ChangeNotifier {
 bool get isAuth {
   bool temp = FirebaseAuth.instance.currentUser != null;
   return temp;
+}
+
+String? globalEmail;
+String? globalPassword;
+setGlobalEmailAndPassword(String email, String password) {
+  globalEmail = email;
+  globalPassword = password;
 }

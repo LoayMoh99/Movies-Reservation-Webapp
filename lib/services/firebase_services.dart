@@ -379,6 +379,7 @@ class FireBaseServices {
           }
         }
         newScreeningRoom += selectedSeats;
+
         await moviesRef.doc(movieID).update({
           'screeningRoom': newScreeningRoom,
         }).then((value) async {
