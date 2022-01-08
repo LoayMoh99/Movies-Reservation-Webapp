@@ -1,5 +1,6 @@
 import 'dart:async';
 // ignore: import_of_legacy_library_into_null_safe
+import 'package:movies_webapp/providers/movies_provider.dart';
 import 'package:universal_html/prefer_universal/html.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:firebase/firebase.dart' as fb;
@@ -271,6 +272,7 @@ class FireBaseServices {
 
       final CollectionReference moviesRef =
           FirebaseFirestore.instance.collection('/movies');
+
       if (photo != null) {
         await uploadImageFile(photo, "${title + startTime.toString()}")
             .then((photoUrl) async {
@@ -327,6 +329,64 @@ class FireBaseServices {
           return false;
         });
       }
+      return true;
+    } catch (error) {
+      print(error);
+      showErrorDialog(
+        "Error",
+        "An error occurs , try again later!",
+        context,
+      );
+      return false;
+    }
+  }
+
+  // update movies
+  Future<bool> updateMovie(
+    String id,
+    String title,
+    DateTime date, //stored only date
+    DateTime startTime, //stored only time
+    DateTime endTime, //stored only time
+    int roomSize, //20 or 30
+    BuildContext context,
+  ) async {
+    try {
+      bool connection = await Connection().checkInternetConnection();
+      if (!connection) {
+        showErrorDialog(
+          "Network Error",
+          "Check Internet Connection",
+          context,
+        );
+        return false;
+      }
+
+      final CollectionReference moviesRef =
+          FirebaseFirestore.instance.collection('/movies');
+
+      await moviesRef.doc(id).update({
+        'title': title,
+        'date': date.toString(),
+        'startTime': startTime.toString(),
+        'endTime': endTime.toString(),
+        'roomSize': roomSize,
+      }).then((value) {
+        showErrorDialog(
+          "Success",
+          "Movie has been updated successfully.",
+          context,
+        );
+        return true;
+      }).catchError((error) {
+        print(error);
+        showErrorDialog(
+          "Error",
+          "Movie has not been updated. Try again later!",
+          context,
+        );
+        return false;
+      });
       return true;
     } catch (error) {
       print(error);
