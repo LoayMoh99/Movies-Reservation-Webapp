@@ -29,3 +29,5 @@ A Movies Reservation Project for CUFE course (Computer Consultations Systems).
   ![alt text](scnshots/manager.png)
 - ### Add / Edit Movie View:
   ![alt text](scnshots/add.png)
+  
+  
