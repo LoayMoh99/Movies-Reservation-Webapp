@@ -26,7 +26,7 @@ A Movies Reservation Project for CUFE course (Computer Consultations Systems).
 - ### Buy Ticket Page:
   ![alt text](scnshots/buyticket.png)
 - ### Manager Main Page:
-  ![alt text](scnshots/manager.png)
+  ![alt text](scnshots/manger.png)
 - ### Add / Edit Movie View:
   ![alt text](scnshots/add.png)
   
