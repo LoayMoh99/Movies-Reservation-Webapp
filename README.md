@@ -15,12 +15,17 @@ A Movies Reservation Project for CUFE course (Computer Consultations Systems).
 - ### Login Page:
   ![alt text](scnshots/login.png)
 - ### Register Page:
-  ![alt text](scnshots/login.png)
+  ![alt text](scnshots/Register.png)
 
 ## Main Pages:
 
 - ### Admin Main Page:
+  ![alt text](scnshots/admin.png)
 - ### Customer / Guest Main Page:
+  ![alt text](scnshots/cust_guest.png)
 - ### Buy Ticket Page:
+  ![alt text](scnshots/buyticket.png)
 - ### Manager Main Page:
+  ![alt text](scnshots/manager.png)
 - ### Add / Edit Movie View:
+  ![alt text](scnshots/add.png)
